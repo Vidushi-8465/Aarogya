@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AAROGYA — Healthcare Assistant</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #F5F7FA;
+    --surface:  #FFFFFF;
+    --border:   #E6ECF3;
+    --border2:  #D8E2EE;
+    --primary:  #3A8F87;
+    --pri-lt:   rgba(58,143,135,0.07);
+    --pri-md:   rgba(58,143,135,0.15);
+    --green:    #4BAE8A;
+    --grn-lt:   rgba(75,174,138,0.08);
+    --amber:    #D4874A;
+    --amb-lt:   rgba(212,135,74,0.08);
+    --red:      #C95F4A;
+    --red-lt:   rgba(201,95,74,0.08);
+    --text:     #1C2B37;
+    --text2:    #4D6070;
+    --muted:    #96A8B8;
+    --sh:       0 1px 10px rgba(28,43,55,0.06);
+    --sh2:      0 4px 22px rgba(28,43,55,0.09);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    min-height: 100vh;
+    font-size: 13px;
+  }
+
+  /* subtle bg texture */
+  body::before {
+    content:''; position:fixed; inset:0; pointer-events:none;
+    background:
+      radial-gradient(ellipse at 5% 10%, rgba(58,143,135,0.045) 0%, transparent 40%),
+      radial-gradient(ellipse at 95% 90%, rgba(75,174,138,0.035) 0%, transparent 40%);
+  }
+
+  /* ── LAYOUT: fixed left sidebar + scrollable right ── */
+  .layout {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    grid-template-rows: auto 1fr;
+    min-height: 100vh;
+    position: relative;
+  }
+
+  /* HEADER spans full width */
+  .topbar {
+    grid-column: 1 / -1;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 26px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 1px 8px rgba(28,43,55,0.05);
+    position: sticky; top: 0; z-index: 50;
+  }
+
+  .brand { display:flex; align-items:center; gap:12px; }
+
+  .brand-icon {
+    width:38px; height:38px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--green) 100%);
+    border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:18px;
+    box-shadow: 0 3px 12px rgba(58,143,135,0.2);
+  }
+
+  .brand h1 {
+    font-family:'Instrument Serif', serif;
+    font-size:21px; color:var(--primary); letter-spacing:0.03em;
+  }
+
+  .brand p { font-size:10px; color:var(--muted); letter-spacing:0.08em; text-transform:uppercase; margin-top:1px; }
+
+  .topbar-right { display:flex; align-items:center; gap:12px; }
+
+  .pill {
+    display:flex; align-items:center; gap:7px;
+    background:var(--bg); border:1px solid var(--border);
+    border-radius:20px; padding:6px 14px;
+    font-size:11px; font-family:'DM Mono',monospace; color:var(--text2);
+  }
+
+  .dot {
+    width:6px; height:6px; border-radius:50%;
+    background:var(--green);
+    animation:glow 2.5s infinite;
+  }
+
+  @keyframes glow {
+    0%,100%{ box-shadow:0 0 0 0 rgba(75,174,138,0.5); }
+    50%{ box-shadow:0 0 0 4px rgba(75,174,138,0); }
+  }
+
+  .clk {
+    font-family:'DM Mono',monospace; font-size:12px; color:var(--muted);
+    background:var(--bg); border:1px solid var(--border);
+    padding:5px 12px; border-radius:7px;
+  }
+
+  /* ── LEFT PANEL ── */
+  .left-panel {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 20px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    overflow-y: auto;
+    height: calc(100vh - 63px);
+    position: sticky;
+    top: 63px;
+  }
+
+  .section-label {
+    font-size:9.5px; text-transform:uppercase;
+    letter-spacing:0.12em; color:var(--muted);
+    font-family:'DM Mono',monospace;
+    margin-bottom:8px;
+  }
+
+  /* Health Score */
+  .score-wrap {
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+    padding:18px 12px;
+    background:var(--bg); border-radius:14px;
+    border:1px solid var(--border);
+  }
+
+  .score-ring { position:relative; width:120px; height:120px; }
+  .score-ring svg { transform:rotate(-90deg); }
+  .r-track { fill:none; stroke:var(--border); stroke-width:8; }
+  .r-fill {
+    fill:none; stroke:var(--green); stroke-width:8;
+    stroke-linecap:round; stroke-dasharray:314; stroke-dashoffset:78;
+    transition:stroke-dashoffset 0.9s ease, stroke 0.4s ease;
+    filter:drop-shadow(0 0 6px rgba(75,174,138,0.25));
+  }
+  .score-center {
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+  }
+  .score-num { font-family:'Instrument Serif',serif; font-size:36px; color:var(--text); line-height:1; }
+  .score-sub { font-size:10px; color:var(--muted); margin-top:1px; }
+  .score-label2 { font-size:12px; font-weight:600; color:var(--green); }
+
+  /* Mode */
+  .mode-chips { display:flex; flex-direction:column; gap:6px; }
+
+  .mchip {
+    padding:8px 14px; border-radius:9px; font-size:12px; font-weight:500;
+    border:1px solid var(--border2); background:var(--bg);
+    color:var(--muted); cursor:pointer; transition:all 0.3s ease;
+    text-align:left;
+  }
+  .mchip.active { background:var(--pri-lt); border-color:var(--primary); color:var(--primary); }
+
+  /* Baseline */
+  .bl-row {
+    background:var(--bg); border:1px solid var(--border);
+    border-radius:9px; padding:10px 13px;
+    display:flex; flex-direction:column; gap:7px;
+  }
+  .bl-label { font-size:11px; color:var(--text2); font-family:'DM Mono',monospace; }
+  .bl-bar { height:4px; background:var(--border); border-radius:2px; overflow:hidden; }
+  .bl-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--green)); border-radius:2px; transition:width 0.5s ease; }
+
+  /* Z chips */
+  .z-chips { display:flex; flex-wrap:wrap; gap:5px; }
+
+  .zchip {
+    font-size:10px; font-family:'DM Mono',monospace;
+    padding:3px 9px; border-radius:20px;
+    border:1px solid var(--border); background:var(--bg);
+    color:var(--muted); transition:all 0.4s;
+  }
+  .zchip.flagged { background:var(--amb-lt); border-color:var(--amber); color:var(--amber); }
+
+  /* AI Insights */
+  .insight {
+    padding:10px 12px; background:var(--bg); border-radius:9px;
+    border-left:2.5px solid var(--primary);
+    font-size:11.5px; line-height:1.55; color:var(--text2);
+    transition:border-color 0.4s;
+  }
+  .insight.g { border-left-color:var(--green); background:var(--grn-lt); }
+  .insight.w { border-left-color:var(--amber); background:var(--amb-lt); }
+  .insight.d { border-left-color:var(--red); background:var(--red-lt); }
+  .insight small { display:block; font-size:9.5px; color:var(--muted); margin-top:4px; font-family:'DM Mono',monospace; }
+
+  /* Alert Log */
+  .alog { max-height:150px; overflow-y:auto; }
+  .alog::-webkit-scrollbar { width:2px; }
+  .alog::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+
+  .aitem { display:flex; gap:8px; padding:7px 0; border-bottom:1px solid var(--border); animation:aIn 0.3s ease; }
+  @keyframes aIn { from{opacity:0;transform:translateX(-4px)} to{opacity:1;transform:translateX(0)} }
+  .adot { width:6px; height:6px; border-radius:50%; margin-top:3px; flex-shrink:0; }
+  .adot.info { background:var(--primary); }
+  .adot.warn { background:var(--amber); }
+  .adot.emergency { background:var(--red); animation:glow 1s infinite; }
+  .adot.ok { background:var(--green); }
+  .atext { font-size:11px; line-height:1.4; color:var(--text2); }
+  .atime { font-size:9.5px; color:var(--muted); font-family:'DM Mono',monospace; margin-top:2px; }
+
+  /* ── RIGHT PANEL ── */
+  .right-panel {
+    padding: 20px 22px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* Demo bar */
+  .demo-bar {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:11px; padding:10px 16px;
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+    box-shadow:var(--sh);
+  }
+  .dlabel { font-size:9.5px; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; font-family:'DM Mono',monospace; }
+  .dbtn {
+    padding:6px 13px; border-radius:7px; font-size:11.5px; font-weight:500;
+    border:1px solid var(--border2); background:var(--bg); color:var(--text2);
+    cursor:pointer; font-family:'Plus Jakarta Sans',sans-serif;
+    transition:all 0.25s ease;
+  }
+  .dbtn:hover { background:var(--pri-lt); border-color:var(--primary); color:var(--primary); transform:translateY(-1px); }
+  .dbtn.r:hover { background:var(--red-lt); border-color:var(--red); color:var(--red); }
+  .dbtn.a:hover { background:var(--amb-lt); border-color:var(--amber); color:var(--amber); }
+
+  /* Intervention banner */
+  .intv {
+    display:none;
+    background:linear-gradient(135deg,rgba(58,143,135,0.055),rgba(75,174,138,0.04));
+    border:1px solid rgba(58,143,135,0.2);
+    border-radius:12px; padding:13px 18px;
+    align-items:center; gap:14px;
+    animation:bIn 0.4s ease;
+    box-shadow:0 2px 14px rgba(58,143,135,0.07);
+  }
+  .intv.show { display:flex; }
+  @keyframes bIn { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+
+  .bRing {
+    width:40px; height:40px; border-radius:50%;
+    border:2px solid var(--primary); flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; font-size:16px;
+    animation:bR 4s infinite ease-in-out;
+  }
+  @keyframes bR {
+    0%,100%{ transform:scale(0.9); box-shadow:0 0 0 0 rgba(58,143,135,0.25); }
+    50%{ transform:scale(1.08); box-shadow:0 0 0 7px rgba(58,143,135,0); }
+  }
+  .intv-txt h3 { font-size:13px; font-weight:600; color:var(--primary); margin-bottom:3px; }
+  .intv-txt p { font-size:11.5px; color:var(--text2); line-height:1.5; }
+  .intv-close {
+    margin-left:auto; background:none; border:1px solid var(--border2);
+    color:var(--muted); padding:5px 12px; border-radius:7px;
+    font-size:11px; cursor:pointer; font-family:'DM Mono',monospace;
+    transition:all 0.2s;
+  }
+  .intv-close:hover { border-color:var(--primary); color:var(--primary); }
+
+  /* VITALS SECTION HEADER */
+  .section-head {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:2px;
+  }
+  .section-head-label { font-size:10px; text-transform:uppercase; letter-spacing:0.12em; color:var(--muted); font-family:'DM Mono',monospace; }
+  .ai-pill {
+    font-size:9.5px; background:var(--pri-lt); color:var(--primary);
+    border:1px solid var(--pri-md); padding:2px 9px;
+    border-radius:20px; font-family:'DM Mono',monospace;
+  }
+
+  /* VITALS GRID — 2 columns on right panel */
+  .vitals-grid {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+  }
+
+  .vcard {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:14px; padding:16px 18px;
+    position:relative; overflow:hidden;
+    box-shadow:var(--sh); transition:box-shadow 0.4s, border-color 0.4s;
+  }
+  .vcard:hover { box-shadow:var(--sh2); }
+
+  .vcard::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:2.5px;
+    border-radius:14px 14px 0 0;
+    background:var(--green); opacity:0.4;
+    transition:background 0.4s, opacity 0.4s;
+  }
+  .vcard.warn { border-color:rgba(212,135,74,0.22); }
+  .vcard.warn::before { background:var(--amber); opacity:0.7; }
+  .vcard.danger { border-color:rgba(201,95,74,0.22); }
+  .vcard.danger::before { background:var(--red); opacity:0.9; }
+
+  .vhead { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+  .vname { font-size:10px; text-transform:uppercase; letter-spacing:0.12em; color:var(--muted); font-family:'DM Mono',monospace; }
+  .vicon { font-size:14px; opacity:0.5; }
+
+  .vval { font-family:'Instrument Serif',serif; font-size:38px; line-height:1; transition:color 0.4s; }
+  .vunit { font-size:10px; color:var(--muted); font-family:'DM Mono',monospace; letter-spacing:0.07em; margin-top:2px; }
+
+  .vtag {
+    position:absolute; top:14px; right:14px;
+    font-size:9.5px; padding:3px 8px; border-radius:20px;
+    font-family:'DM Mono',monospace; font-weight:500;
+  }
+  .tn { background:var(--grn-lt); color:var(--green); }
+  .tw { background:var(--amb-lt); color:var(--amber); }
+  .td { background:var(--red-lt); color:var(--red); }
+
+  .chart { margin-top:12px; height:30px; }
+  .chart svg { width:100%; height:100%; overflow:visible; }
+
+  /* Environment row */
+  .env-grid {
+    display:grid; grid-template-columns:repeat(4,1fr); gap:10px;
+  }
+
+  .ecard {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:12px; padding:13px 14px;
+    box-shadow:var(--sh);
+  }
+  .elbl { font-size:9.5px; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); font-family:'DM Mono',monospace; margin-bottom:6px; }
+  .eval { font-family:'Instrument Serif',serif; font-size:24px; transition:color 0.4s; }
+
+  /* Activity card */
+  .act-card {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:14px; padding:16px 18px;
+    box-shadow:var(--sh);
+  }
+
+  .act-states { display:flex; gap:7px; flex-wrap:wrap; margin-top:10px; }
+
+  .astate {
+    font-size:10px; font-family:'DM Mono',monospace;
+    padding:4px 10px; border-radius:20px;
+    border:1px solid var(--border); background:var(--bg);
+    color:var(--muted); transition:all 0.4s ease;
+  }
+
+  /* Fall overlay */
+  .fover {
+    display:none; position:fixed; inset:0;
+    background:rgba(201,95,74,0.035);
+    border:3px solid var(--red);
+    z-index:100; pointer-events:none;
+    animation:fP 0.55s infinite;
+  }
+  .fover.show { display:block; }
+  @keyframes fP { 0%,100%{opacity:1}50%{opacity:0.3} }
+
+  .fbanner {
+    display:none; position:fixed;
+    top:20px; left:50%; transform:translateX(-50%);
+    background:var(--red); color:white;
+    padding:12px 32px; border-radius:11px;
+    font-weight:700; font-size:14px; letter-spacing:0.03em;
+    z-index:101; box-shadow:0 8px 30px rgba(201,95,74,0.35);
+  }
+  .fbanner.show { display:block; animation:bD 0.3s ease; }
+  @keyframes bD { from{transform:translateX(-50%) translateY(-16px);opacity:0} to{transform:translateX(-50%) translateY(0);opacity:1} }
+
+  /* Divider label */
+  .divider {
+    font-size:9.5px; text-transform:uppercase; letter-spacing:0.12em;
+    color:var(--muted); font-family:'DM Mono',monospace;
+    display:flex; align-items:center; gap:10px;
+  }
+  .divider::before,.divider::after { content:''; flex:1; height:1px; background:var(--border); }
+
+  @media(max-width:860px){
+    .layout{grid-template-columns:1fr;}
+    .left-panel{position:relative;height:auto;top:0;}
+    .vitals-grid{grid-template-columns:1fr;}
+    .env-grid{grid-template-columns:repeat(2,1fr);}
+  }
+</style>
+</head>
+<body>
+
+<div class="fover" id="fOver"></div>
+<div class="fbanner" id="fBanner">⚠ Fall Detected — Emergency Alert Sent</div>
+
+<div class="layout">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-icon">🫀</div>
+      <div>
+        <h1>AAROGYA</h1>
+        <p>At-Home Healthcare Assistant · IoTians · Hack4Innovation 2026</p>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="pill"><div class="dot"></div>Monitoring Live</div>
+      <div class="clk" id="clk">--:--:--</div>
+    </div>
+  </div>
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+
+    <!-- Health Score -->
+    <div>
+      <div class="section-label">Daily Health Score</div>
+      <div class="score-wrap">
+        <div class="score-ring">
+          <svg viewBox="0 0 110 110" width="120" height="120">
+            <circle class="r-track" cx="55" cy="55" r="50"/>
+            <circle class="r-fill" id="rFill" cx="55" cy="55" r="50"/>
+          </svg>
+          <div class="score-center">
+            <span class="score-num" id="hScore">--</span>
+            <span class="score-sub">/100</span>
+          </div>
+        </div>
+        <div class="score-label2" id="sStatus">Calculating…</div>
+      </div>
+    </div>
+
+    <!-- System Mode -->
+    <div>
+      <div class="section-label">System Mode</div>
+      <div class="mode-chips">
+        <button class="mchip active" id="mp">Passive Monitoring</button>
+        <button class="mchip" id="ma">Active Assistance</button>
+        <button class="mchip" id="mr">Morning Ritual</button>
+      </div>
+    </div>
+
+    <!-- Baseline -->
+    <div>
+      <div class="section-label">Baseline Calibration</div>
+      <div class="bl-row">
+        <div class="bl-label" id="blLbl">Building baseline…</div>
+        <div class="bl-bar"><div class="bl-fill" id="blFill" style="width:0%"></div></div>
+      </div>
+      <div class="z-chips" style="margin-top:9px;">
+        <div class="zchip" id="cHR">HR: normal</div>
+        <div class="zchip" id="cSP">SpO₂: normal</div>
+        <div class="zchip" id="cTM">Temp: normal</div>
+        <div class="zchip" id="cAC">Activity: active</div>
+      </div>
+    </div>
+
+    <!-- AI Analysis -->
+    <div>
+      <div class="section-label" style="display:flex;align-items:center;justify-content:space-between;">
+        AI Context Analysis
+        <span class="ai-pill">Z-Score</span>
+      </div>
+      <div id="aiBox">
+        <div class="insight g">All vitals within personal baseline. No intervention needed.<small>Context-Aware · Live</small></div>
+      </div>
+    </div>
+
+    <!-- Event Log -->
+    <div>
+      <div class="section-label" style="display:flex;align-items:center;justify-content:space-between;">
+        Event Log <span id="aCnt" style="font-size:9.5px;background:var(--pri-lt);color:var(--primary);border:1px solid var(--pri-md);padding:2px 8px;border-radius:20px;font-family:'DM Mono',monospace;">0</span>
+      </div>
+      <div class="alog" id="aLog">
+        <div style="color:var(--muted);font-size:11px;padding:12px 0;text-align:center;">No events yet</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+
+    <!-- Demo Controls -->
+    <div class="demo-bar">
+      <span class="dlabel">Demo →</span>
+      <button class="dbtn" onclick="setScene('normal')">Normal State</button>
+      <button class="dbtn a" onclick="setScene('borderline')">Low SpO₂</button>
+      <button class="dbtn a" onclick="setScene('intervention')">Trigger Intervention</button>
+      <button class="dbtn r" onclick="setScene('fall')">Simulate Fall</button>
+      <button class="dbtn" onclick="setScene('recovery')">Post Recovery</button>
+    </div>
+
+    <!-- Intervention Banner -->
+    <div class="intv" id="intvB">
+      <div class="bRing">🌬️</div>
+      <div class="intv-txt">
+        <h3>Active Assistance — Guided Breathing</h3>
+        <p>SpO₂ borderline at 94%. 5-cycle deep breathing initiated before caregiver alert. Rechecking in 2 min.</p>
+      </div>
+      <button class="intv-close" onclick="document.getElementById('intvB').classList.remove('show')">Dismiss</button>
+    </div>
+
+    <!-- Vitals -->
+    <div>
+      <div class="section-head" style="margin-bottom:10px;">
+        <span class="section-head-label">Vital Parameters</span>
+        <span class="ai-pill">Sensor Fusion Active</span>
+      </div>
+      <div class="vitals-grid">
+
+        <div class="vcard normal" id="cHr">
+          <div class="vhead"><span class="vname">Heart Rate</span><span class="vicon">💓</span></div>
+          <div class="vval" id="vHr" style="color:var(--primary)">--</div>
+          <div class="vunit">BPM</div>
+          <div class="vtag tn" id="tHr">Normal</div>
+          <div class="chart"><svg viewBox="0 0 200 30" preserveAspectRatio="none"><path id="pHr" fill="none" stroke="var(--primary)" stroke-width="1.8" opacity="0.4"/></svg></div>
+        </div>
+
+        <div class="vcard normal" id="cSp">
+          <div class="vhead"><span class="vname">SpO₂</span><span class="vicon">🫁</span></div>
+          <div class="vval" id="vSp" style="color:var(--green)">--</div>
+          <div class="vunit">%</div>
+          <div class="vtag tn" id="tSp">Normal</div>
+          <div class="chart"><svg viewBox="0 0 200 30" preserveAspectRatio="none"><path id="pSp" fill="none" stroke="var(--green)" stroke-width="1.8" opacity="0.4"/></svg></div>
+        </div>
+
+        <div class="vcard normal" id="cTp">
+          <div class="vhead"><span class="vname">Body Temperature</span><span class="vicon">🌡️</span></div>
+          <div class="vval" id="vTp" style="color:var(--amber)">--</div>
+          <div class="vunit">°C</div>
+          <div class="vtag tn" id="tTp">Normal</div>
+          <div class="chart"><svg viewBox="0 0 200 30" preserveAspectRatio="none"><path id="pTp" fill="none" stroke="var(--amber)" stroke-width="1.8" opacity="0.4"/></svg></div>
+        </div>
+
+        <!-- Activity -->
+        <div class="act-card vcard normal" id="cAct">
+          <div class="vhead"><span class="vname">Activity State</span><span class="vicon">🏃</span></div>
+          <div class="vval" id="vAct" style="color:#7870B0; font-size:20px; margin-top:4px;">--</div>
+          <div class="vunit" style="margin-top:3px;">MPU6050 Classified</div>
+          <div class="vtag tn" id="tAct">Active</div>
+          <div class="act-states" id="actDots"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Environment -->
+    <div>
+      <div class="divider" style="margin-bottom:12px;">Environment Sensors</div>
+      <div class="env-grid">
+        <div class="ecard">
+          <div class="elbl">Room Temp</div>
+          <div class="eval" id="eTemp" style="color:var(--amber)">--°C</div>
+        </div>
+        <div class="ecard">
+          <div class="elbl">Humidity</div>
+          <div class="eval" id="eHum" style="color:var(--primary)">--%</div>
+        </div>
+        <div class="ecard">
+          <div class="elbl">Air Quality (AQI)</div>
+          <div class="eval" id="eAir" style="color:var(--green)">--</div>
+        </div>
+        <div class="ecard">
+          <div class="elbl">AQI Status</div>
+          <div class="eval" id="eAqi" style="font-size:15px;margin-top:4px;font-family:'Plus Jakarta Sans';font-weight:600;color:var(--green)">--</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end right-panel -->
+
+</div><!-- end layout -->
+
+<script>
+  let scene='normal', tick=0, blProg=0, blReady=false;
+  const bHR={mean:74,std:4}, bSP={mean:97.5,std:0.8};
+  let evtCnt=0, fTmr=null;
+  const hist={hr:[],sp:[],tp:[]}, MH=40;
+
+  // Clock
+  setInterval(()=>{ document.getElementById('clk').textContent=new Date().toLocaleTimeString('en-IN',{hour12:false}); },1000);
+
+  function data(){
+    const n=()=>(Math.random()-0.5)*2, t=tick;
+    const m={
+      normal:      {hr:Math.round(72+4*Math.sin(t/15)+n()),  sp:+((97.5+0.4*Math.sin(t/20)+n()*0.2).toFixed(1)), tp:+((36.6+n()*0.08).toFixed(1)), act:'Resting',       rt:+((27+n()*0.3).toFixed(1)), hm:Math.round(58+n()*2), aq:Math.round(38+n()*3)},
+      borderline:  {hr:Math.round(88+n()*3),                 sp:+((94.5+n()*0.3).toFixed(1)),                    tp:+((36.8+n()*0.1).toFixed(1)),  act:'Inactive',      rt:+((29+n()*0.3).toFixed(1)), hm:Math.round(65+n()*2), aq:Math.round(63+n()*4)},
+      intervention:{hr:Math.round(82+n()*3),                 sp:+((94+(tick%20)*0.08+n()*0.2).toFixed(1)),        tp:+((36.9+n()*0.1).toFixed(1)),  act:'Resting',       rt:+((29+n()*0.3).toFixed(1)), hm:Math.round(63+n()*2), aq:Math.round(58+n()*3)},
+      fall:        {hr:Math.round(118+n()*5),                sp:+((95+n()*0.4).toFixed(1)),                       tp:+((36.7+n()*0.1).toFixed(1)),  act:'FALL DETECTED', rt:+((27+n()*0.3).toFixed(1)), hm:Math.round(60+n()*2), aq:Math.round(42+n()*3)},
+      recovery:    {hr:Math.round(76+n()*3),                 sp:+((97.2+n()*0.2).toFixed(1)),                     tp:+((36.6+n()*0.08).toFixed(1)), act:'Resting',       rt:+((27+n()*0.3).toFixed(1)), hm:Math.round(58+n()*2), aq:Math.round(36+n()*3)}
+    };
+    return m[scene]||m.normal;
+  }
+
+  function calcScore(d){
+    let s=100;
+    if(d.sp<95)s-=(95-d.sp)*8;if(d.hr>100)s-=(d.hr-100)*1.5;if(d.hr<55)s-=(55-d.hr)*2;
+    if(d.tp>37.5)s-=(d.tp-37.5)*15;if(d.aq>60)s-=(d.aq-60)*0.5;
+    if(d.act==='Inactive')s-=8;if(d.act==='FALL DETECTED')s-=40;
+    return Math.max(0,Math.min(100,Math.round(s)));
+  }
+
+  function z(v,b){return Math.abs((v-b.mean)/b.std);}
+
+  function bezier(arr,mn,mx,W,H){
+    if(arr.length<2)return'';
+    const p=arr.map((v,i)=>({x:(i/(MH-1))*W,y:H-Math.max(1,Math.min(H-1,((v-mn)/(mx-mn))*H))}));
+    let d=`M ${p[0].x} ${p[0].y}`;
+    for(let i=1;i<p.length;i++){const cx=(p[i-1].x+p[i].x)/2;d+=` C ${cx} ${p[i-1].y}, ${cx} ${p[i].y}, ${p[i].x} ${p[i].y}`;}
+    return d;
+  }
+
+  function addEvt(type,msg){
+    evtCnt++;
+    document.getElementById('aCnt').textContent=evtCnt;
+    const log=document.getElementById('aLog');
+    const now=new Date().toLocaleTimeString('en-IN',{hour12:false});
+    const el=document.createElement('div');el.className='aitem';
+    el.innerHTML=`<div class="adot ${type}"></div><div><div class="atext">${msg}</div><div class="atime">${now}</div></div>`;
+    if(log.firstChild?.textContent?.includes('No events'))log.innerHTML='';
+    log.insertBefore(el,log.firstChild);
+  }
+
+  function setMode(m){
+    ['mp','ma','mr'].forEach(id=>document.getElementById(id).classList.remove('active'));
+    document.getElementById({passive:'mp',active:'ma',ritual:'mr'}[m])?.classList.add('active');
+  }
+
+  function setScene(s){
+    scene=s;
+    document.getElementById('intvB').classList.remove('show');
+    document.getElementById('fOver').classList.remove('show');
+    document.getElementById('fBanner').classList.remove('show');
+    if(fTmr){clearTimeout(fTmr);fTmr=null;}
+    if(s==='borderline')addEvt('warn','SpO₂ borderline (94%). Monitoring activity context.');
+    if(s==='intervention'){document.getElementById('intvB').classList.add('show');setMode('active');addEvt('warn','Active Assistance initiated. Guided breathing started.');}
+    if(s==='fall'){document.getElementById('fOver').classList.add('show');document.getElementById('fBanner').classList.add('show');addEvt('emergency','⚠ FALL DETECTED — Alert sent via WhatsApp.');fTmr=setTimeout(()=>{document.getElementById('fOver').classList.remove('show');document.getElementById('fBanner').classList.remove('show');},6000);}
+    if(s==='recovery'){setMode('passive');addEvt('ok','SpO₂ recovered to 97%. Alert suppressed.');}
+    if(s==='normal')setMode('passive');
+  }
+
+  function aiInsights(d){
+    const b=document.getElementById('aiBox');
+    if(d.act==='FALL DETECTED'){b.innerHTML=`<div class="insight d">Fall confirmed by MPU6050. Sudden acceleration spike, no movement after. Emergency triggered.<small>Fall Detection · High Confidence</small></div>`;return;}
+    if(d.sp<95&&scene==='intervention'){b.innerHTML=`<div class="insight w">SpO₂ ${d.sp}%. Z-score: ${z(d.sp,bSP).toFixed(2)}σ from baseline. Breathing assistance active.<small>Baseline Active · Sensor Fusion</small></div>`;return;}
+    if(d.sp<95){b.innerHTML=`<div class="insight w">SpO₂ ${d.sp}% borderline. Activity: ${d.act}. Z: ${z(d.sp,bSP).toFixed(2)}σ. Monitoring before alert.<small>Context-Aware Analysis</small></div>`;return;}
+    if(scene==='recovery'){b.innerHTML=`<div class="insight g">SpO₂ recovered to ${d.sp}% post-intervention. False alert avoided. Closed-loop complete.<small>Closed-Loop Verified</small></div>`;return;}
+    b.innerHTML=`<div class="insight g">Vitals normal. HR: ${z(d.hr,bHR).toFixed(2)}σ · SpO₂: ${z(d.sp,bSP).toFixed(2)}σ from baseline. No anomaly.<small>Z-Score Detection Active</small></div>`;
+  }
+
+  function actDots(act){
+    const states=['Resting','Inactive','Walking','FALL DETECTED'];
+    const cols={'Resting':'var(--primary)','Inactive':'var(--amber)','Walking':'var(--green)','FALL DETECTED':'var(--red)'};
+    document.getElementById('actDots').innerHTML=states.map(s=>`<div class="astate" style="background:${s===act?cols[s]+'12':'var(--bg)'};border-color:${s===act?cols[s]:'var(--border)'};color:${s===act?cols[s]:'var(--muted)'};">${s}</div>`).join('');
+  }
+
+  function update(){
+    tick++;
+    if(!blReady){
+      blProg=Math.min(100,blProg+1.5);
+      document.getElementById('blFill').style.width=blProg+'%';
+      document.getElementById('blLbl').textContent=blProg<100?`Calibrating… ${Math.round(blProg)}%`:'Baseline Ready ✓';
+      if(blProg>=100){blReady=true;addEvt('info','Personalized baseline ready. AI anomaly detection active.');}
+    }
+
+    const d=data();
+    hist.hr.push(d.hr);hist.sp.push(d.sp);hist.tp.push(d.tp);
+    if(hist.hr.length>MH){hist.hr.shift();hist.sp.shift();hist.tp.shift();}
+
+    // Score
+    const sc=calcScore(d);
+    document.getElementById('hScore').textContent=sc;
+    const C=314;
+    document.getElementById('rFill').style.strokeDashoffset=C-(sc/100)*C;
+    const scol=sc>=80?'var(--green)':sc>=60?'var(--amber)':'var(--red)';
+    document.getElementById('rFill').style.stroke=scol;
+    document.getElementById('sStatus').textContent=sc>=80?'● Good Health':sc>=60?'● Needs Attention':'● Critical';
+    document.getElementById('sStatus').style.color=scol;
+
+    // HR
+    const hc=d.hr>100?'var(--red)':d.hr>90?'var(--amber)':'var(--primary)';
+    document.getElementById('vHr').textContent=d.hr;
+    document.getElementById('vHr').style.color=hc;
+    document.getElementById('cHr').className='vcard '+(d.hr>100?'danger':d.hr>90?'warn':'normal');
+    const th=document.getElementById('tHr');
+    th.textContent=d.hr>100?'High':d.hr>90?'Elevated':'Normal';
+    th.className='vtag '+(d.hr>100?'td':d.hr>90?'tw':'tn');
+
+    // SpO2
+    const sc2=d.sp<93?'var(--red)':d.sp<95?'var(--amber)':'var(--green)';
+    document.getElementById('vSp').textContent=d.sp.toFixed(1);
+    document.getElementById('vSp').style.color=sc2;
+    document.getElementById('cSp').className='vcard '+(d.sp<93?'danger':d.sp<95?'warn':'normal');
+    const ts=document.getElementById('tSp');
+    ts.textContent=d.sp<93?'Critical':d.sp<95?'Low':'Normal';
+    ts.className='vtag '+(d.sp<93?'td':d.sp<95?'tw':'tn');
+
+    // Temp
+    const tc=d.tp>37.5?'var(--red)':d.tp>37.2?'var(--amber)':'#B8874A';
+    document.getElementById('vTp').textContent=d.tp.toFixed(1);
+    document.getElementById('vTp').style.color=tc;
+    document.getElementById('cTp').className='vcard '+(d.tp>37.5?'danger':d.tp>37.2?'warn':'normal');
+    const tt=document.getElementById('tTp');
+    tt.textContent=d.tp>37.5?'Fever':d.tp>37.2?'Elevated':'Normal';
+    tt.className='vtag '+(d.tp>37.5?'td':d.tp>37.2?'tw':'tn');
+
+    // Activity
+    const ac=d.act==='FALL DETECTED'?'var(--red)':d.act==='Inactive'?'var(--amber)':d.act==='Walking'?'var(--green)':'#7870B0';
+    document.getElementById('vAct').textContent=d.act;
+    document.getElementById('vAct').style.color=ac;
+    actDots(d.act);
+
+    // Env
+    document.getElementById('eTemp').textContent=d.rt+'°C';
+    document.getElementById('eHum').textContent=d.hm+'%';
+    document.getElementById('eAir').textContent=d.aq;
+    const aqS=d.aq<50?'Good':d.aq<70?'Moderate':'Poor';
+    const aqC=d.aq<50?'var(--green)':d.aq<70?'var(--amber)':'var(--red)';
+    document.getElementById('eAqi').textContent=aqS;
+    document.getElementById('eAqi').style.color=aqC;
+
+    // Sparklines
+    document.getElementById('pHr').setAttribute('d',bezier(hist.hr,50,130,200,30));
+    document.getElementById('pSp').setAttribute('d',bezier(hist.sp,88,100,200,30));
+    document.getElementById('pTp').setAttribute('d',bezier(hist.tp,35.5,38.5,200,30));
+
+    // Z chips
+    if(blReady){
+      const zHR=z(d.hr,bHR), zSP=z(d.sp,bSP);
+      const ch=document.getElementById('cHR');
+      ch.textContent=`HR: ${zHR>2?'⚠ anomaly':'normal'} (${zHR.toFixed(1)}σ)`;
+      ch.className='zchip'+(zHR>2?' flagged':'');
+      const cs=document.getElementById('cSP');
+      cs.textContent=`SpO₂: ${zSP>2?'⚠ anomaly':'normal'} (${zSP.toFixed(1)}σ)`;
+      cs.className='zchip'+(zSP>2?' flagged':'');
+      const ca=document.getElementById('cAC');
+      ca.textContent=`Activity: ${d.act.toLowerCase()}`;
+      ca.className='zchip'+(['FALL DETECTED','Inactive'].includes(d.act)?' flagged':'');
+      aiInsights(d);
+    }
+  }
+
+  setInterval(update,1000); update();
+  addEvt('info','System online. Baseline calibration started.');
+</script>
+</body>
+</html>

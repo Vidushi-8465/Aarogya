@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign In — AAROGYA</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #F5F7FA;
+  --surface: #FFFFFF;
+  --border:  #E6ECF3;
+  --primary: #3A8F87;
+  --pri-lt:  rgba(58,143,135,0.08);
+  --pri-md:  rgba(58,143,135,0.18);
+  --green:   #4BAE8A;
+  --amber:   #D4874A;
+  --red:     #C95F4A;
+  --text:    #1C2B37;
+  --text2:   #4D6070;
+  --muted:   #96A8B8;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body {
+  font-family:'Plus Jakarta Sans',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+}
+
+/* ─── LEFT PANEL ─── */
+.left {
+  background:linear-gradient(145deg, #1C2B37 0%, #213040 50%, #1a3535 100%);
+  position:relative;
+  display:flex;flex-direction:column;
+  justify-content:space-between;
+  padding:44px;
+  overflow:hidden;
+}
+
+/* dot grid */
+.left::before {
+  content:'';position:absolute;inset:0;
+  background-image:radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size:30px 30px;
+}
+
+/* color blobs */
+.left::after {
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 60% 55% at 20% 30%, rgba(58,143,135,0.2) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 50% at 80% 75%, rgba(75,174,138,0.13) 0%, transparent 55%);
+}
+
+.left-top {
+  position:relative;z-index:1;
+  display:flex;align-items:center;gap:10px;
+}
+
+.brand-icon {
+  width:36px;height:36px;
+  background:linear-gradient(135deg,var(--primary),var(--green));
+  border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;
+  box-shadow:0 3px 14px rgba(58,143,135,0.3);
+}
+
+.brand-name {
+  font-family:'Instrument Serif',serif;
+  font-size:22px;color:white;letter-spacing:0.04em;
+}
+
+.left-mid {
+  position:relative;z-index:1;
+}
+
+.left-mid h2 {
+  font-family:'Instrument Serif',serif;
+  font-size:clamp(34px,4vw,50px);
+  color:white;line-height:1.1;
+  margin-bottom:18px;
+}
+
+.left-mid h2 em {
+  font-style:italic;
+  color:var(--green);
+}
+
+.left-mid p {
+  font-size:14px;color:rgba(255,255,255,0.5);
+  line-height:1.7;max-width:360px;
+}
+
+/* Live vitals strip */
+.vitals-strip {
+  display:flex;flex-direction:column;gap:10px;
+  margin-top:36px;
+}
+
+.vstrip-item {
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(255,255,255,0.055);
+  border:1px solid rgba(255,255,255,0.09);
+  border-radius:10px;
+  padding:11px 15px;
+  transition:background 0.3s;
+}
+
+.vstrip-label {
+  font-size:10px;font-family:'DM Mono',monospace;
+  color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.1em;
+}
+.vstrip-val {
+  font-family:'DM Mono',monospace;font-size:16px;color:white;
+}
+.vstrip-ok {
+  font-size:9.5px;color:var(--green);
+  font-family:'DM Mono',monospace;
+  display:flex;align-items:center;gap:4px;
+}
+.vstatus-dot{
+  width:5px;height:5px;border-radius:50%;background:var(--green);
+  animation:glow 2.5s infinite;
+}
+
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(75,174,138,0.5);}50%{box-shadow:0 0 0 4px rgba(75,174,138,0);}}
+
+.left-bot {
+  position:relative;z-index:1;
+  font-size:10.5px;font-family:'DM Mono',monospace;
+  color:rgba(255,255,255,0.25);
+  letter-spacing:0.06em;
+}
+
+/* ─── RIGHT PANEL ─── */
+.right {
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:60px 48px;
+  position:relative;
+}
+
+/* subtle corner accent */
+.right::before {
+  content:'';position:absolute;top:0;left:0;right:0;
+  height:3px;
+  background:linear-gradient(90deg,transparent,var(--primary),var(--green),transparent);
+  opacity:0.4;
+}
+
+.form-wrap {
+  width:100%;max-width:400px;
+  animation:fadeUp 0.5s ease both;
+}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+
+.form-eyebrow {
+  font-size:9.5px;font-family:'DM Mono',monospace;
+  color:var(--primary);text-transform:uppercase;letter-spacing:0.12em;
+  margin-bottom:10px;
+}
+
+.form-title {
+  font-family:'Instrument Serif',serif;
+  font-size:34px;color:var(--text);margin-bottom:6px;
+}
+
+.form-sub {
+  font-size:13px;color:var(--muted);margin-bottom:36px;line-height:1.5;
+}
+
+/* tabs */
+.tabs {
+  display:flex;background:var(--bg);
+  border:1px solid var(--border);border-radius:10px;
+  padding:3px;margin-bottom:28px;gap:3px;
+}
+
+.tab {
+  flex:1;padding:9px;border-radius:8px;
+  font-size:12.5px;font-weight:600;
+  text-align:center;cursor:pointer;
+  transition:all 0.25s;border:none;
+  font-family:'Plus Jakarta Sans',sans-serif;
+  color:var(--muted);background:none;
+}
+.tab.active {
+  background:var(--surface);color:var(--primary);
+  box-shadow:0 1px 6px rgba(28,43,55,0.08);
+  border:1px solid var(--border);
+}
+
+/* fields */
+.field {
+  margin-bottom:16px;
+  animation:fadeUp 0.5s ease both;
+}
+
+.field label {
+  display:block;font-size:11.5px;font-weight:600;
+  color:var(--text2);margin-bottom:7px;
+  letter-spacing:0.02em;
+}
+
+.field input {
+  width:100%;padding:11px 15px;
+  border:1.5px solid var(--border);
+  border-radius:10px;background:var(--surface);
+  font-size:13.5px;color:var(--text);
+  font-family:'Plus Jakarta Sans',sans-serif;
+  transition:border-color 0.25s,box-shadow 0.25s;
+  outline:none;
+}
+
+.field input::placeholder{color:var(--muted);}
+
+.field input:focus {
+  border-color:var(--primary);
+  box-shadow:0 0 0 3px rgba(58,143,135,0.1);
+}
+
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+/* options row */
+.opt-row {
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:22px;
+}
+
+.checkbox-label {
+  display:flex;align-items:center;gap:8px;
+  font-size:12px;color:var(--text2);cursor:pointer;
+}
+
+.checkbox-label input[type=checkbox]{
+  width:14px;height:14px;accent-color:var(--primary);cursor:pointer;
+}
+
+.forgot {
+  font-size:12px;color:var(--primary);text-decoration:none;font-weight:500;
+  transition:opacity 0.2s;
+}
+.forgot:hover{opacity:0.75;}
+
+/* submit */
+.btn-submit {
+  width:100%;padding:13px;border-radius:11px;
+  background:var(--primary);color:white;border:none;
+  font-size:14px;font-weight:700;cursor:pointer;
+  font-family:'Plus Jakarta Sans',sans-serif;
+  transition:all 0.3s;
+  box-shadow:0 4px 18px rgba(58,143,135,0.3);
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.btn-submit:hover{background:#2e7a72;transform:translateY(-1px);box-shadow:0 6px 24px rgba(58,143,135,0.38);}
+.btn-submit:active{transform:translateY(0);}
+
+/* divider */
+.or-div {
+  display:flex;align-items:center;gap:12px;
+  margin:22px 0;font-size:11px;color:var(--muted);
+  font-family:'DM Mono',monospace;
+}
+.or-div::before,.or-div::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* demo login */
+.demo-row {
+  display:flex;flex-direction:column;gap:10px;
+}
+
+.btn-demo {
+  width:100%;padding:11px;border-radius:10px;
+  background:var(--bg);border:1.5px solid var(--border);
+  color:var(--text2);font-size:12.5px;font-weight:600;
+  cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;
+  transition:all 0.25s;display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.btn-demo:hover{border-color:var(--primary);color:var(--primary);background:var(--pri-lt);}
+
+/* footer note */
+.form-foot {
+  text-align:center;margin-top:24px;
+  font-size:12px;color:var(--muted);
+}
+.form-foot a{color:var(--primary);text-decoration:none;font-weight:600;}
+
+/* success state */
+.success-overlay {
+  display:none;
+  position:fixed;inset:0;
+  background:rgba(245,247,250,0.97);
+  z-index:200;
+  flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;
+  animation:fadeUp 0.4s ease;
+}
+.success-overlay.show{display:flex;}
+
+.success-icon {
+  width:72px;height:72px;border-radius:50%;
+  background:linear-gradient(135deg,var(--primary),var(--green));
+  display:flex;align-items:center;justify-content:center;
+  font-size:30px;margin-bottom:20px;
+  box-shadow:0 6px 30px rgba(58,143,135,0.3);
+  animation:pop 0.5s 0.1s ease both;
+}
+
+@keyframes pop{from{transform:scale(0.5);opacity:0;}to{transform:scale(1);opacity:1;}}
+
+.success-title {
+  font-family:'Instrument Serif',serif;font-size:34px;
+  color:var(--text);margin-bottom:10px;
+}
+.success-sub{font-size:14px;color:var(--muted);margin-bottom:28px;}
+
+.btn-go {
+  padding:13px 32px;border-radius:11px;
+  background:var(--primary);color:white;border:none;
+  font-size:14px;font-weight:700;cursor:pointer;
+  font-family:'Plus Jakarta Sans',sans-serif;
+  box-shadow:0 4px 18px rgba(58,143,135,0.3);
+  transition:all 0.3s;
+  text-decoration:none;display:inline-block;
+}
+.btn-go:hover{background:#2e7a72;transform:translateY(-1px);}
+
+/* field animation delays */
+.field:nth-child(1){animation-delay:0.1s;}
+.field:nth-child(2){animation-delay:0.15s;}
+.field:nth-child(3){animation-delay:0.2s;}
+.field:nth-child(4){animation-delay:0.25s;}
+
+/* error state */
+.field input.error{border-color:var(--red);}
+.err-msg{font-size:11px;color:var(--red);margin-top:6px;display:none;}
+.err-msg.show{display:block;}
+
+@media(max-width:860px){
+  body{grid-template-columns:1fr;}
+  .left{display:none;}
+  .right{padding:40px 24px;}
+}
+</style>
+</head>
+<body>
+
+<!-- SUCCESS OVERLAY -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-icon">✓</div>
+  <h2 class="success-title">Welcome back.</h2>
+  <p class="success-sub">Redirecting to your health dashboard…</p>
+  <a href="index.html" class="btn-go">Open Dashboard →</a>
+</div>
+
+<!-- LEFT -->
+<div class="left">
+  <div class="left-top">
+    <div class="brand-icon">🫀</div>
+    <span class="brand-name">AAROGYA</span>
+  </div>
+
+  <div class="left-mid">
+    <h2>Your health,<br>always <em>watching.</em></h2>
+    <p>Sign in to access your live vitals dashboard, AI anomaly reports, and caregiver alert settings.</p>
+
+    <div class="vitals-strip">
+      <div class="vstrip-item">
+        <span class="vstrip-label">Heart Rate</span>
+        <span class="vstrip-val" id="sv1">72 BPM</span>
+        <span class="vstrip-ok"><div class="vstatus-dot"></div>Normal</span>
+      </div>
+      <div class="vstrip-item">
+        <span class="vstrip-label">SpO₂</span>
+        <span class="vstrip-val" id="sv2">97.4%</span>
+        <span class="vstrip-ok"><div class="vstatus-dot"></div>Normal</span>
+      </div>
+      <div class="vstrip-item">
+        <span class="vstrip-label">Health Score</span>
+        <span class="vstrip-val" id="sv3">91 / 100</span>
+        <span class="vstrip-ok"><div class="vstatus-dot"></div>Good</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="left-bot">IoTians · Hack4Innovation 2026</div>
+</div>
+
+<!-- RIGHT -->
+<div class="right">
+  <div class="form-wrap">
+
+    <div class="form-eyebrow">Patient Portal</div>
+    <h1 class="form-title">Sign In</h1>
+    <p class="form-sub">Access your live vitals and health monitoring dashboard.</p>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" id="tabLogin" onclick="switchTab('login')">Sign In</button>
+      <button class="tab" id="tabReg" onclick="switchTab('register')">Register</button>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div id="loginForm">
+      <div class="field">
+        <label>Email Address</label>
+        <input type="email" id="loginEmail" placeholder="you@example.com">
+        <div class="err-msg" id="emailErr">Please enter a valid email.</div>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="loginPass" placeholder="••••••••">
+        <div class="err-msg" id="passErr">Password must be at least 6 characters.</div>
+      </div>
+
+      <div class="opt-row">
+        <label class="checkbox-label">
+          <input type="checkbox" checked> Remember me
+        </label>
+        <a href="#" class="forgot">Forgot password?</a>
+      </div>
+
+      <button class="btn-submit" onclick="handleLogin()">
+        Sign In →
+      </button>
+
+      <div class="or-div">or continue with</div>
+
+      <div class="demo-row">
+        <button class="btn-demo" onclick="demoLogin()">
+          🚀 Demo Login — skip credentials
+        </button>
+      </div>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div id="registerForm" style="display:none;">
+      <div class="field-row">
+        <div class="field">
+          <label>First Name</label>
+          <input type="text" placeholder="Arjun">
+        </div>
+        <div class="field">
+          <label>Last Name</label>
+          <input type="text" placeholder="Sharma">
+        </div>
+      </div>
+      <div class="field">
+        <label>Email Address</label>
+        <input type="email" placeholder="you@example.com">
+      </div>
+      <div class="field">
+        <label>Caregiver Phone (for alerts)</label>
+        <input type="tel" placeholder="+91 98765 43210">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" placeholder="Create a password">
+      </div>
+
+      <button class="btn-submit" style="margin-top:6px;" onclick="handleRegister()">
+        Create Account →
+      </button>
+    </div>
+
+    <div class="form-foot" id="formFoot">
+      Don't have an account? <a href="#" onclick="switchTab('register');return false;">Register here</a>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function switchTab(t) {
+  document.getElementById('loginForm').style.display = t==='login'?'block':'none';
+  document.getElementById('registerForm').style.display = t==='register'?'block':'none';
+  document.getElementById('tabLogin').className = 'tab'+(t==='login'?' active':'');
+  document.getElementById('tabReg').className = 'tab'+(t==='register'?' active':'');
+  document.getElementById('formFoot').innerHTML = t==='login'
+    ? 'Don\'t have an account? <a href="#" onclick="switchTab(\'register\');return false;">Register here</a>'
+    : 'Already have an account? <a href="#" onclick="switchTab(\'login\');return false;">Sign in</a>';
+}
+
+function handleLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  let ok = true;
+
+  const emailErr = document.getElementById('emailErr');
+  const passErr = document.getElementById('passErr');
+  const emailEl = document.getElementById('loginEmail');
+  const passEl = document.getElementById('loginPass');
+
+  emailEl.classList.remove('error'); emailErr.classList.remove('show');
+  passEl.classList.remove('error'); passErr.classList.remove('show');
+
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    emailEl.classList.add('error'); emailErr.classList.add('show'); ok = false;
+  }
+  if (pass.length < 6) {
+    passEl.classList.add('error'); passErr.classList.add('show'); ok = false;
+  }
+
+  if (ok) showSuccess();
+}
+
+function handleRegister() {
+  showSuccess();
+}
+
+function demoLogin() {
+  document.getElementById('loginEmail').value = 'demo@aarogya.health';
+  document.getElementById('loginPass').value = 'demo1234';
+  setTimeout(showSuccess, 400);
+}
+
+function showSuccess() {
+  document.getElementById('successOverlay').classList.add('show');
+  setTimeout(() => { window.location.href='index.html'; }, 3000);
+}
+
+// Animate vitals on left panel
+let tick=0;
+setInterval(()=>{
+  tick++;
+  const hr = Math.round(72 + 4*Math.sin(tick/15) + (Math.random()-0.5)*2);
+  const sp = (97.5 + 0.4*Math.sin(tick/20) + (Math.random()-0.5)*0.3).toFixed(1);
+  const score = Math.max(88, Math.min(95, Math.round(91 + Math.sin(tick/20)*3)));
+  document.getElementById('sv1').textContent = hr+' BPM';
+  document.getElementById('sv2').textContent = sp+'%';
+  document.getElementById('sv3').textContent = score+' / 100';
+}, 1200);
+</script>
+</body>
+</html>

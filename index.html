@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AAROGYA — Healthcare Assistant</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="fover" id="fOver"></div>
+<div class="fbanner" id="fBanner">⚠ Fall Detected — Emergency Alert Sent</div>
+
+<div class="layout">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-icon">🫀</div>
+      <div>
+        <h1>AAROGYA</h1>
+        <p>At-Home Healthcare Assistant · IoTians · Hack4Innovation 2026</p>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="pill"><div class="dot"></div>Monitoring Live</div>
+      <div class="clk" id="clk">--:--:--</div>
+    </div>
+  </div>
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+
+    <!-- Health Score -->
+    <div>
+      <div class="section-label">Daily Health Score</div>
+      <div class="score-wrap">
+        <div class="score-ring">
+          <svg viewBox="0 0 110 110" width="120" height="120">
+            <circle class="r-track" cx="55" cy="55" r="50"/>
+            <circle class="r-fill" id="rFill" cx="55" cy="55" r="50"/>
+          </svg>
+          <div class="score-center">
+            <span class="score-num" id="hScore">--</span>
+            <span class="score-sub">/100</span>
+          </div>
+        </div>
+        <div class="score-label2" id="sStatus">Calculating…</div>
+      </div>
+    </div>
+
+    <!-- System Mode -->
+    <div>
+      <div class="section-label">System Mode</div>
+      <div class="mode-chips">
+        <button class="mchip active" id="mp">Passive Monitoring</button>
+        <button class="mchip" id="ma">Active Assistance</button>
+        <button class="mchip" id="mr">Morning Ritual</button>
+      </div>
+    </div>
+
+    <!-- Baseline -->
+    <div>
+      <div class="section-label">Baseline Calibration</div>
+      <div class="bl-row">
+        <div class="bl-label" id="blLbl">Building baseline…</div>
+        <div class="bl-bar"><div class="bl-fill" id="blFill" style="width:0%"></div></div>
+      </div>
+      <div class="z-chips" style="margin-top:9px;">
+        <div class="zchip" id="cHR">HR: normal</div>
+        <div class="zchip" id="cSP">SpO₂: normal</div>
+        <div class="zchip" id="cTM">Temp: normal</div>
+        <div class="zchip" id="cAC">Activity: active</div>
+      </div>
+    </div>
+
+    <!-- AI Analysis -->
+    <div>
+      <div class="section-label" style="display:flex;align-items:center;justify-content:space-between;">
+        AI Context Analysis
+        <span class="ai-pill">Z-Score</span>
+      </div>
+      <div id="aiBox">
+        <div class="insight g">All vitals within personal baseline. No intervention needed.<small>Context-Aware · Live</small></div>
+      </div>
+    </div>
+
+    <!-- Event Log -->
+    <div>
+      <div class="section-label" style="display:flex;align-items:center;justify-content:space-between;">
+        Event Log <span id="aCnt" style="font-size:9.5px;background:var(--pri-lt);color:var(--primary);border:1px solid var(--pri-md);padding:2px 8px;border-radius:20px;font-family:'DM Mono',monospace;">0</span>
+      </div>
+      <div class="alog" id="aLog">
+        <div style="color:var(--muted);font-size:11px;padding:12px 0;text-align:center;">No events yet</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+
+    <!-- Demo Controls -->
+    <div class="demo-bar">
+      <span class="dlabel">Demo →</span>
+      <button class="dbtn" onclick="setScene('normal')">Normal State</button>
+      <button class="dbtn a" onclick="setScene('borderline')">Low SpO₂</button>
+      <button class="dbtn a" onclick="setScene('intervention')">Trigger Intervention</button>
+      <button class="dbtn r" onclick="setScene('fall')">Simulate Fall</button>
+      <button class="dbtn" onclick="setScene('recovery')">Post Recovery</button>
+    </div>
+
+    <!-- Intervention Banner -->
+    <div class="intv" id="intvB">
+      <div class="bRing">🌬️</div>
+      <div class="intv-txt">
+        <h3>Active Assistance — Guided Breathing</h3>
+        <p>SpO₂ borderline at 94%. 5-cycle deep breathing initiated before caregiver alert. Rechecking in 2 min.</p>
+      </div>
+      <button class="intv-close" onclick="document.getElementById('intvB').classList.remove('show')">Dismiss</button>
+    </div>
+
+    <!-- Vitals -->
+    <div>
+      <div class="section-head" style="margin-bottom:10px;">
+        <span class="section-head-label">Vital Parameters</span>
+        <span class="ai-pill">Sensor Fusion Active</span>
+      </div>
+      <div class="vitals-grid">
+
+        <div class="vcard normal" id="cHr">
+          <div class="vhead"><span class="vname">Heart Rate</span><span class="vicon">💓</span></div>
+          <div class="vval" id="vHr" style="color:var(--primary)">--</div>
+          <div class="vunit">BPM</div>
+          <div class="vtag tn" id="tHr">Normal</div>
+          <div class="chart"><svg viewBox="0 0 200 30" preserveAspectRatio="none"><path id="pHr" fill="none" stroke="var(--primary)" stroke-width="1.8" opacity="0.4"/></svg></div>
+        </div>
+
+        <div class="vcard normal" id="cSp">
+          <div class="vhead"><span class="vname">SpO₂</span><span class="vicon">🫁</span></div>
+          <div class="vval" id="vSp" style="color:var(--green)">--</div>
+          <div class="vunit">%</div>
+          <div class="vtag tn" id="tSp">Normal</div>
+          <div class="chart"><svg viewBox="0 0 200 30" preserveAspectRatio="none"><path id="pSp" fill="none" stroke="var(--green)" stroke-width="1.8" opacity="0.4"/></svg></div>
+        </div>
+
+        <div class="vcard normal" id="cTp">
+          <div class="vhead"><span class="vname">Body Temperature</span><span class="vicon">🌡️</span></div>
+          <div class="vval" id="vTp" style="color:var(--amber)">--</div>
+          <div class="vunit">°C</div>
+          <div class="vtag tn" id="tTp">Normal</div>
+          <div class="chart"><svg viewBox="0 0 200 30" preserveAspectRatio="none"><path id="pTp" fill="none" stroke="var(--amber)" stroke-width="1.8" opacity="0.4"/></svg></div>
+        </div>
+
+        <!-- Activity -->
+        <div class="act-card vcard normal" id="cAct">
+          <div class="vhead"><span class="vname">Activity State</span><span class="vicon">🏃</span></div>
+          <div class="vval" id="vAct" style="color:#7870B0; font-size:20px; margin-top:4px;">--</div>
+          <div class="vunit" style="margin-top:3px;">MPU6050 Classified</div>
+          <div class="vtag tn" id="tAct">Active</div>
+          <div class="act-states" id="actDots"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Environment -->
+    <div>
+      <div class="divider" style="margin-bottom:12px;">Environment Sensors</div>
+      <div class="env-grid">
+        <div class="ecard">
+          <div class="elbl">Room Temp</div>
+          <div class="eval" id="eTemp" style="color:var(--amber)">--°C</div>
+        </div>
+        <div class="ecard">
+          <div class="elbl">Humidity</div>
+          <div class="eval" id="eHum" style="color:var(--primary)">--%</div>
+        </div>
+        <div class="ecard">
+          <div class="elbl">Air Quality (AQI)</div>
+          <div class="eval" id="eAir" style="color:var(--green)">--</div>
+        </div>
+        <div class="ecard">
+          <div class="elbl">AQI Status</div>
+          <div class="eval" id="eAqi" style="font-size:15px;margin-top:4px;font-family:'Plus Jakarta Sans';font-weight:600;color:var(--green)">--</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end right-panel -->
+
+</div><!-- end layout -->
+
+<script src="script.js"></script>
+</body>
+</html>

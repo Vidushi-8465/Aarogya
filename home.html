@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AAROGYA — At-Home Healthcare Assistant</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #F5F7FA;
+  --surface: #FFFFFF;
+  --border:  #E6ECF3;
+  --primary: #3A8F87;
+  --pri-lt:  rgba(58,143,135,0.08);
+  --pri-md:  rgba(58,143,135,0.18);
+  --green:   #4BAE8A;
+  --amber:   #D4874A;
+  --red:     #C95F4A;
+  --text:    #1C2B37;
+  --text2:   #4D6070;
+  --muted:   #96A8B8;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body {
+  font-family:'Plus Jakarta Sans',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
+}
+
+/* ─── NAV ─── */
+nav {
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 60px;
+  background:rgba(245,247,250,0.85);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+}
+
+.nav-brand {
+  display:flex;align-items:center;gap:10px;
+}
+
+.nav-icon {
+  width:34px;height:34px;
+  background:linear-gradient(135deg,var(--primary),var(--green));
+  border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;
+  box-shadow:0 3px 14px rgba(58,143,135,0.25);
+}
+
+.nav-title {
+  font-family:'Instrument Serif',serif;
+  font-size:20px;color:var(--primary);
+  letter-spacing:0.04em;
+}
+
+.nav-links {
+  display:flex;align-items:center;gap:28px;
+  list-style:none;
+}
+.nav-links a {
+  font-size:12.5px;color:var(--text2);text-decoration:none;
+  font-weight:500;letter-spacing:0.02em;
+  transition:color 0.2s;
+}
+.nav-links a:hover{color:var(--primary);}
+
+.nav-cta {
+  display:flex;gap:10px;align-items:center;
+}
+
+.btn-ghost {
+  padding:8px 20px;border-radius:9px;font-size:12.5px;font-weight:600;
+  border:1px solid var(--border);background:transparent;color:var(--text2);
+  cursor:pointer;transition:all 0.25s;font-family:'Plus Jakarta Sans',sans-serif;
+  text-decoration:none;display:inline-block;
+}
+.btn-ghost:hover{border-color:var(--primary);color:var(--primary);background:var(--pri-lt);}
+
+.btn-primary {
+  padding:8px 22px;border-radius:9px;font-size:12.5px;font-weight:600;
+  background:var(--primary);color:white;border:none;cursor:pointer;
+  transition:all 0.25s;font-family:'Plus Jakarta Sans',sans-serif;
+  text-decoration:none;display:inline-block;
+  box-shadow:0 3px 14px rgba(58,143,135,0.28);
+}
+.btn-primary:hover{background:#2e7a72;transform:translateY(-1px);box-shadow:0 5px 20px rgba(58,143,135,0.35);}
+
+/* ─── HERO ─── */
+.hero {
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:120px 60px 80px;
+  position:relative;
+  text-align:center;
+}
+
+/* bg blobs */
+.hero::before {
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 60% 55% at 15% 20%, rgba(58,143,135,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 85% 80%, rgba(75,174,138,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 50% 50%, rgba(212,135,74,0.03) 0%, transparent 60%);
+}
+
+/* floating dots grid */
+.hero::after {
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:radial-gradient(circle, rgba(58,143,135,0.12) 1px, transparent 1px);
+  background-size:36px 36px;
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
+}
+
+.hero-eyebrow {
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:20px;padding:6px 16px;
+  font-size:11px;font-family:'DM Mono',monospace;color:var(--primary);
+  letter-spacing:0.08em;text-transform:uppercase;
+  margin-bottom:26px;position:relative;z-index:1;
+  animation:fadeUp 0.6s ease both;
+}
+
+.live-dot {
+  width:6px;height:6px;border-radius:50%;background:var(--green);
+  animation:glow 2.5s infinite;
+}
+
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(75,174,138,0.5);}50%{box-shadow:0 0 0 4px rgba(75,174,138,0);}}
+
+.hero-headline {
+  font-family:'Instrument Serif',serif;
+  font-size:clamp(46px,7vw,84px);
+  line-height:1.05;
+  letter-spacing:-0.01em;
+  color:var(--text);
+  position:relative;z-index:1;
+  animation:fadeUp 0.7s 0.1s ease both;
+  max-width:860px;
+}
+
+.hero-headline em {
+  font-style:italic;color:var(--primary);
+}
+
+.hero-sub {
+  margin-top:22px;
+  font-size:16px;line-height:1.7;
+  color:var(--text2);
+  max-width:520px;
+  position:relative;z-index:1;
+  font-weight:400;
+  animation:fadeUp 0.7s 0.2s ease both;
+}
+
+.hero-actions {
+  display:flex;gap:12px;margin-top:36px;
+  position:relative;z-index:1;
+  animation:fadeUp 0.7s 0.3s ease both;
+}
+
+.btn-lg {
+  padding:14px 32px;border-radius:12px;font-size:14px;font-weight:600;
+  font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;
+  transition:all 0.3s;text-decoration:none;display:inline-flex;align-items:center;gap:8px;
+}
+
+.btn-lg.primary {
+  background:var(--primary);color:white;border:none;
+  box-shadow:0 4px 20px rgba(58,143,135,0.32);
+}
+.btn-lg.primary:hover{background:#2e7a72;transform:translateY(-2px);box-shadow:0 8px 28px rgba(58,143,135,0.38);}
+
+.btn-lg.ghost {
+  background:var(--surface);color:var(--text);
+  border:1.5px solid var(--border);
+}
+.btn-lg.ghost:hover{border-color:var(--primary);color:var(--primary);background:var(--pri-lt);}
+
+/* ─── HERO STATS ─── */
+.hero-stats {
+  display:flex;gap:0;margin-top:56px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow:0 4px 28px rgba(28,43,55,0.07);
+  position:relative;z-index:1;
+  animation:fadeUp 0.7s 0.4s ease both;
+}
+
+.stat {
+  padding:20px 32px;flex:1;text-align:center;
+  border-right:1px solid var(--border);
+  position:relative;
+}
+.stat:last-child{border-right:none;}
+
+.stat-num {
+  font-family:'Instrument Serif',serif;
+  font-size:32px;color:var(--primary);
+  display:flex;align-items:baseline;gap:3px;justify-content:center;
+}
+.stat-unit{font-size:14px;color:var(--muted);}
+.stat-lbl {
+  font-size:10.5px;font-family:'DM Mono',monospace;
+  color:var(--muted);text-transform:uppercase;letter-spacing:0.09em;
+  margin-top:4px;
+}
+
+/* ─── FEATURES ─── */
+.section {
+  padding:90px 60px;
+  max-width:1200px;margin:0 auto;
+}
+
+.section-eyebrow {
+  font-size:10.5px;font-family:'DM Mono',monospace;
+  color:var(--primary);text-transform:uppercase;
+  letter-spacing:0.12em;margin-bottom:14px;
+}
+
+.section-title {
+  font-family:'Instrument Serif',serif;
+  font-size:clamp(32px,4vw,48px);
+  line-height:1.12;
+  color:var(--text);margin-bottom:16px;
+}
+.section-title em{font-style:italic;color:var(--primary);}
+
+.section-desc {
+  font-size:15px;color:var(--text2);max-width:500px;line-height:1.7;
+  margin-bottom:48px;
+}
+
+.features-grid {
+  display:grid;grid-template-columns:repeat(3,1fr);gap:18px;
+}
+
+.feat {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:28px 24px;
+  transition:box-shadow 0.3s, transform 0.3s;
+  position:relative;overflow:hidden;
+}
+.feat:hover{box-shadow:0 8px 32px rgba(28,43,55,0.1);transform:translateY(-3px);}
+
+.feat::before {
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--primary),var(--green));
+  opacity:0;transition:opacity 0.3s;
+}
+.feat:hover::before{opacity:1;}
+
+.feat-icon {
+  width:44px;height:44px;border-radius:12px;
+  background:var(--pri-lt);border:1px solid var(--pri-md);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;margin-bottom:18px;
+}
+
+.feat-title {
+  font-size:15px;font-weight:700;color:var(--text);
+  margin-bottom:8px;
+}
+
+.feat-desc {
+  font-size:13px;color:var(--text2);line-height:1.65;
+}
+
+/* ─── HOW IT WORKS ─── */
+.how-section {
+  padding:80px 60px;
+  background:var(--surface);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+}
+
+.how-inner {max-width:1200px;margin:0 auto;}
+
+.steps {
+  display:grid;grid-template-columns:repeat(4,1fr);gap:0;
+  margin-top:44px;position:relative;
+}
+
+.steps::before {
+  content:'';position:absolute;top:22px;left:10%;right:10%;height:1px;
+  background:linear-gradient(90deg,transparent,var(--border),var(--primary),var(--border),transparent);
+}
+
+.step {
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  padding:0 16px;position:relative;z-index:1;
+}
+
+.step-num {
+  width:44px;height:44px;border-radius:50%;
+  background:var(--surface);border:2px solid var(--primary);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'DM Mono',monospace;font-size:14px;
+  color:var(--primary);font-weight:500;
+  margin-bottom:20px;
+  box-shadow:0 0 0 6px var(--bg);
+}
+
+.step-icon{font-size:24px;margin-bottom:12px;}
+.step-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px;}
+.step-desc{font-size:12px;color:var(--text2);line-height:1.6;}
+
+/* ─── SENSORS SECTION ─── */
+.sensors-section {padding:90px 60px;}
+.sensors-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;}
+
+.sensor-visual {
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:20px;padding:32px;box-shadow:0 6px 36px rgba(28,43,55,0.08);
+}
+
+.sensor-list {
+  display:flex;flex-direction:column;gap:12px;
+}
+
+.sensor-item {
+  display:flex;align-items:center;gap:14px;
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:11px;padding:13px 16px;
+  transition:border-color 0.25s,background 0.25s;
+  cursor:default;
+}
+.sensor-item:hover{border-color:var(--pri-md);background:var(--pri-lt);}
+
+.sensor-badge {
+  width:36px;height:36px;border-radius:9px;
+  background:var(--pri-lt);border:1px solid var(--pri-md);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;flex-shrink:0;
+}
+
+.sensor-info h4{font-size:13px;font-weight:600;color:var(--text);}
+.sensor-info p{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:2px;}
+
+.sensor-tag {
+  margin-left:auto;font-size:9.5px;
+  background:var(--grn-lt,rgba(75,174,138,0.08));
+  color:var(--green);border:1px solid rgba(75,174,138,0.2);
+  padding:3px 9px;border-radius:20px;
+  font-family:'DM Mono',monospace;flex-shrink:0;
+}
+
+/* ─── CTA BANNER ─── */
+.cta-section {
+  padding:80px 60px;
+  background:linear-gradient(135deg, #1C2B37 0%, #243545 100%);
+  text-align:center;position:relative;overflow:hidden;
+}
+
+.cta-section::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(58,143,135,0.18) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 50%, rgba(75,174,138,0.12) 0%, transparent 50%);
+}
+
+.cta-section::after {
+  content:'';position:absolute;inset:0;
+  background-image:radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size:32px 32px;
+}
+
+.cta-inner{position:relative;z-index:1;}
+
+.cta-title {
+  font-family:'Instrument Serif',serif;
+  font-size:clamp(36px,5vw,58px);
+  color:white;margin-bottom:18px;line-height:1.1;
+}
+.cta-title em{font-style:italic;color:var(--green);}
+
+.cta-sub{
+  font-size:15px;color:rgba(255,255,255,0.55);
+  max-width:460px;margin:0 auto 36px;line-height:1.7;
+}
+
+.btn-white {
+  padding:14px 34px;border-radius:12px;font-size:14px;font-weight:600;
+  background:white;color:var(--primary);border:none;cursor:pointer;
+  font-family:'Plus Jakarta Sans',sans-serif;
+  transition:all 0.3s;text-decoration:none;display:inline-block;
+  box-shadow:0 4px 20px rgba(0,0,0,0.15);
+}
+.btn-white:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,0.2);}
+
+/* ─── FOOTER ─── */
+footer {
+  background:var(--surface);
+  border-top:1px solid var(--border);
+  padding:32px 60px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+
+.footer-brand{font-family:'Instrument Serif',serif;font-size:18px;color:var(--primary);}
+.footer-info{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:4px;}
+
+.footer-right{
+  font-size:11.5px;color:var(--muted);text-align:right;
+  font-family:'DM Mono',monospace;
+}
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeUp {
+  from{opacity:0;transform:translateY(20px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+.fade-in {
+  opacity:0;transform:translateY(24px);
+  transition:opacity 0.6s ease, transform 0.6s ease;
+}
+.fade-in.visible{opacity:1;transform:translateY(0);}
+
+/* ─── FLOATING VITALS CARD ─── */
+.float-card {
+  position:absolute;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;padding:14px 18px;
+  box-shadow:0 8px 32px rgba(28,43,55,0.1);
+  font-family:'DM Mono',monospace;
+  animation:float 4s ease-in-out infinite;
+  z-index:2;
+}
+
+.float-card.fc1{left:calc(50% - 480px);top:38%;animation-delay:0s;}
+.float-card.fc2{right:calc(50% - 480px);top:45%;animation-delay:1.5s;}
+.float-card.fc3{left:calc(50% - 400px);bottom:22%;animation-delay:0.8s;}
+
+@keyframes float{
+  0%,100%{transform:translateY(0);}
+  50%{transform:translateY(-10px);}
+}
+
+.fc-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;}
+.fc-val{font-size:20px;color:var(--primary);margin:2px 0;}
+.fc-status{font-size:9px;color:var(--green);}
+
+@media(max-width:900px){
+  nav{padding:14px 22px;}
+  .hero{padding:100px 22px 60px;}
+  .features-grid,.steps,.sensors-inner{grid-template-columns:1fr;}
+  .section,.how-section,.sensors-section,.cta-section{padding:60px 22px;}
+  footer{flex-direction:column;gap:12px;text-align:center;}
+  .float-card{display:none;}
+  .hero-stats{flex-direction:column;gap:0;}
+  .stat{border-right:none;border-bottom:1px solid var(--border);}
+  .stat:last-child{border-bottom:none;}
+  .steps::before{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">
+    <div class="nav-icon">🫀</div>
+    <span class="nav-title">AAROGYA</span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="#sensors">Sensors</a></li>
+  </ul>
+  <div class="nav-cta">
+    <a href="login.html" class="btn-ghost">Sign In</a>
+    <a href="login.html" class="btn-primary">Get Started →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+
+  <!-- Floating vitals cards -->
+  <div class="float-card fc1">
+    <div class="fc-label">Heart Rate</div>
+    <div class="fc-val">72 BPM</div>
+    <div class="fc-status">● Normal</div>
+  </div>
+  <div class="float-card fc2">
+    <div class="fc-label">SpO₂</div>
+    <div class="fc-val">97.4%</div>
+    <div class="fc-status">● Normal</div>
+  </div>
+  <div class="float-card fc3">
+    <div class="fc-label">Health Score</div>
+    <div class="fc-val">91/100</div>
+    <div class="fc-status" style="color:var(--green)">● Good Health</div>
+  </div>
+
+  <div class="hero-eyebrow">
+    <div class="live-dot"></div>
+    IoTians · Hack4Innovation 2026
+  </div>
+
+  <h1 class="hero-headline">
+    Healthcare that watches<br>
+    <em>so you don't have to.</em>
+  </h1>
+
+  <p class="hero-sub">
+    AAROGYA monitors your vitals 24/7 from home — detecting anomalies, guiding interventions, and alerting caregivers before emergencies escalate.
+  </p>
+
+  <div class="hero-actions">
+    <a href="login.html" class="btn-lg primary">Open Dashboard →</a>
+    <a href="#how" class="btn-lg ghost">How it works</a>
+  </div>
+
+  <div class="hero-stats">
+    <div class="stat">
+      <div class="stat-num">5<span class="stat-unit">+</span></div>
+      <div class="stat-lbl">Sensor Inputs</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">1<span class="stat-unit">s</span></div>
+      <div class="stat-lbl">Update Interval</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">0<span class="stat-unit">ms</span></div>
+      <div class="stat-lbl">Alert Latency</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">24<span class="stat-unit">/7</span></div>
+      <div class="stat-lbl">Live Monitoring</div>
+    </div>
+  </div>
+
+</section>
+
+<!-- FEATURES -->
+<section class="section" id="features">
+  <div class="section-eyebrow">Core Capabilities</div>
+  <h2 class="section-title">Built for real care,<br><em>not just monitoring</em></h2>
+  <p class="section-desc">AAROGYA fuses sensor data, AI inference, and closed-loop interventions — all at home, in real time.</p>
+
+  <div class="features-grid">
+
+    <div class="feat fade-in">
+      <div class="feat-icon">🧠</div>
+      <div class="feat-title">AI Anomaly Detection</div>
+      <div class="feat-desc">Personalised Z-score baselines detect deviations specific to your physiology — not generic population thresholds. Context-aware analysis reduces false positives.</div>
+    </div>
+
+    <div class="feat fade-in">
+      <div class="feat-icon">🌬️</div>
+      <div class="feat-title">Closed-Loop Interventions</div>
+      <div class="feat-desc">When SpO₂ dips, AAROGYA guides you through a breathing protocol and re-checks before escalating to a caregiver alert — avoiding unnecessary panic.</div>
+    </div>
+
+    <div class="feat fade-in">
+      <div class="feat-icon">⚡</div>
+      <div class="feat-title">Fall Detection</div>
+      <div class="feat-desc">MPU6050 accelerometer classifies sudden acceleration spikes and post-fall stillness, triggering instant WhatsApp alerts with location context.</div>
+    </div>
+
+    <div class="feat fade-in">
+      <div class="feat-icon">🌡️</div>
+      <div class="feat-title">Multi-Sensor Fusion</div>
+      <div class="feat-desc">Heart rate, SpO₂, temperature, air quality, humidity and motion — fused into a single live health score updated every second.</div>
+    </div>
+
+    <div class="feat fade-in">
+      <div class="feat-icon">📊</div>
+      <div class="feat-title">Personalized Baseline</div>
+      <div class="feat-desc">The system calibrates to your unique physiology over the first session, establishing a personal normal before anomaly detection activates.</div>
+    </div>
+
+    <div class="feat fade-in">
+      <div class="feat-icon">🏠</div>
+      <div class="feat-title">Environment Monitoring</div>
+      <div class="feat-desc">Room temperature, humidity, and AQI are tracked alongside vitals — correlating environmental factors with health changes over time.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<div class="how-section" id="how">
+  <div class="how-inner">
+    <div class="section-eyebrow">Process</div>
+    <h2 class="section-title">From sensor to <em>safety</em></h2>
+
+    <div class="steps">
+
+      <div class="step fade-in">
+        <div class="step-num">01</div>
+        <div class="step-icon">🔌</div>
+        <div class="step-title">Sensors Collect</div>
+        <div class="step-desc">Wearable and environmental sensors continuously stream raw biometric data every second.</div>
+      </div>
+
+      <div class="step fade-in">
+        <div class="step-num">02</div>
+        <div class="step-icon">🧮</div>
+        <div class="step-title">AI Analyses</div>
+        <div class="step-desc">Z-score engine compares readings against your personal baseline, flagging deviations in real time.</div>
+      </div>
+
+      <div class="step fade-in">
+        <div class="step-num">03</div>
+        <div class="step-icon">🎯</div>
+        <div class="step-title">System Intervenes</div>
+        <div class="step-desc">Guided breathing, posture prompts, or rest suggestions are triggered before escalation.</div>
+      </div>
+
+      <div class="step fade-in">
+        <div class="step-num">04</div>
+        <div class="step-icon">📱</div>
+        <div class="step-title">Caregiver Alerted</div>
+        <div class="step-desc">If vitals don't recover, WhatsApp/SMS alerts are sent instantly to designated caregivers.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- SENSORS -->
+<section class="sensors-section" id="sensors">
+  <div class="sensors-inner">
+
+    <div>
+      <div class="section-eyebrow">Hardware Stack</div>
+      <h2 class="section-title">Medical-grade<br><em>sensors</em> at home</h2>
+      <p class="section-desc">AAROGYA integrates a curated stack of affordable, accurate IoT sensors designed for continuous, non-invasive home monitoring.</p>
+
+      <div style="margin-top:20px;display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--text2);">
+          <span style="width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;flex-shrink:0;"></span>
+          All sensors under ₹2,500 total BOM cost
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--text2);">
+          <span style="width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;flex-shrink:0;"></span>
+          ESP32 / Arduino compatible
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--text2);">
+          <span style="width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;flex-shrink:0;"></span>
+          MQTT or serial dashboard integration
+        </div>
+      </div>
+    </div>
+
+    <div class="sensor-visual">
+      <div style="font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:14px;">Sensor Manifest</div>
+      <div class="sensor-list">
+
+        <div class="sensor-item">
+          <div class="sensor-badge">💓</div>
+          <div class="sensor-info">
+            <h4>MAX30102</h4>
+            <p>Heart Rate + SpO₂ · Pulse Oximetry</p>
+          </div>
+          <div class="sensor-tag">Active</div>
+        </div>
+
+        <div class="sensor-item">
+          <div class="sensor-badge">🌡️</div>
+          <div class="sensor-info">
+            <h4>MLX90614</h4>
+            <p>Non-contact IR Body Temperature</p>
+          </div>
+          <div class="sensor-tag">Active</div>
+        </div>
+
+        <div class="sensor-item">
+          <div class="sensor-badge">🏃</div>
+          <div class="sensor-info">
+            <h4>MPU6050</h4>
+            <p>6-axis IMU · Fall Detection + Activity</p>
+          </div>
+          <div class="sensor-tag">Active</div>
+        </div>
+
+        <div class="sensor-item">
+          <div class="sensor-badge">🌫️</div>
+          <div class="sensor-info">
+            <h4>DHT22 + MQ135</h4>
+            <p>Temperature / Humidity / Air Quality</p>
+          </div>
+          <div class="sensor-tag">Active</div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="cta-section">
+  <div class="cta-inner">
+    <h2 class="cta-title">Ready to see it <em>live?</em></h2>
+    <p class="cta-sub">Open the dashboard, run through the demo scenarios, and experience closed-loop healthcare in action.</p>
+    <a href="login.html" class="btn-white">Open Dashboard →</a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <div class="footer-brand">🫀 AAROGYA</div>
+    <div class="footer-info">At-Home Healthcare Assistant · IoTians · Hack4Innovation 2026</div>
+  </div>
+  <div class="footer-right">
+    Built with ❤ for preventive home healthcare<br>
+    © 2026 IoTians Team
+  </div>
+</footer>
+
+<script>
+// Scroll fade-in
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 80);
+      obs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+
+// Animate stat numbers on scroll
+const statObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const nums = e.target.querySelectorAll('.stat-num');
+      nums.forEach(n => {
+        n.style.animation = 'fadeUp 0.5s ease both';
+      });
+    }
+  });
+}, { threshold: 0.3 });
+
+document.querySelectorAll('.hero-stats').forEach(el => statObs.observe(el));
+</script>
+</body>
+</html>
